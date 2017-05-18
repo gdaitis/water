@@ -1,0 +1,120 @@
+<!DOCTYPE html> 
+<html lang="en">
+
+</head>
+
+<body>
+	<p>
+  		<label for="nSLider2" style="display: inline-block; width: 240px; text-align: right"> 
+  			Year: <span id="nYear-value2">…</span>
+  		</label>
+  		<input type="range" min="1" max="1000" id="nSLider2">
+	</p>
+
+	<div id="vizContainer2"></div>
+
+	<script type="text/javascript">
+		var improvedWaterSourceData;
+		var fertilityRateData;
+		var infantMortalityData;
+		var maternalMortalityData;
+		var primaryCompletionData;
+
+		var allData = [];
+
+		var currentVisibleDataAbove2;
+		var currentVisibleDataBelow2;
+
+		var width = 800;
+		var height = 800;
+		var svgCanvas;
+
+		// $(document).ready(function() {
+		// 	drawCanvas2();
+		// });
+
+		var arcAbove = d3.arc()
+				.innerRadius(0)
+			    .outerRadius(20)
+			    .startAngle(-90 * (Math.PI/180))
+			    .endAngle(90 * (Math.PI/180));
+
+		var arcBelow = d3.arc()
+				.innerRadius(0)
+			    .outerRadius(20)
+			    .startAngle(90 * (Math.PI/180))
+			    .endAngle(270 * (Math.PI/180));
+
+		function drawCanvas2() {
+			svgCanvas = d3.select("#vizContainer2").append("svg") 
+				.attrs({
+					width: width,
+					height: height
+				});
+
+			d3.select("#nSLider2").on("input", function() {
+	  			update1(+this.value, currentVisibleDataAbove2, currentVisibleDataBelow2);
+			});
+
+		    svgCanvas.append("path")
+		    	.attrs({
+		    		d: arcAbove,
+		    		transform: "translate(400,300)",
+		    		id: "arc1-2"
+		    	});
+
+		    svgCanvas.append("path")
+		    	.attrs({
+		    		d: arcBelow,
+		    		transform: "translate(400,320)",
+		    		id: "arc2-2"
+		    	});
+
+		    update1(1, allData[3][0], allData[3][1]);
+		}
+
+		function update1(sliderValue, visibleDataAbove, visibleDataBelow) {
+			currentVisibleDataBelow2 = visibleDataBelow;
+			currentVisibleDataAbove2 = visibleDataAbove;
+
+			var years = visibleDataBelow.years.keys();
+			for (var i=0; i < years.length; i++) {
+				years[i] = parseInt(years[i]);
+			}
+
+			var sliderScale = d3.scaleQuantize()
+				.domain([1, 1000])
+				.range(years);
+
+			var selectedYear = sliderScale(sliderValue);
+			d3.select("#nYear-value2").text(selectedYear);
+			d3.select("#nSLider2").property("value", sliderValue);
+
+			var minRadius = 20;
+			var maxRadius = 250;
+
+			var minAbove = d3.min(visibleDataAbove.years.values());
+			var maxAbove = d3.max(visibleDataAbove.years.values());
+			var radiusScaleAbove = d3.scaleLinear().domain([minAbove, maxAbove]).range([minRadius, maxRadius]);
+
+			var minBelow = d3.min(visibleDataBelow.years.values());
+			var maxBelow = d3.max(visibleDataBelow.years.values());
+			var radiusScaleBelow = d3.scaleLinear().domain([minBelow, maxBelow]).range([minRadius, maxRadius]);
+
+			arcAbove.outerRadius(radiusScaleAbove(visibleDataAbove.years["$"+selectedYear]));
+			d3.select("#arc1-2").transition()
+				.duration(500)
+				.attr("d", arcAbove);
+
+			arcBelow.outerRadius(radiusScaleBelow(visibleDataBelow.years["$"+selectedYear]));
+			d3.select("#arc2-2").transition()
+				.duration(500)
+				.attr("d", arcBelow);
+
+			console.log("update canvas 2");
+		}
+		
+
+	</script>
+</body>
+</html>

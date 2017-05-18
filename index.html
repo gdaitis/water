@@ -4,96 +4,210 @@
 	<meta charset="utf-8">
 	<title>CHANGE TITLE HERE</title>
 
+	<link rel="stylesheet" type="text/css" href="libs/jquery.fullPage.css" />
 
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="libs/scrolloverflow.js"></script>
+	<script type="text/javascript" src="libs/jquery.fullPage.js"></script>
 
-<style type="text/css">
-/*	svg{ 
-		background-color: "black";
-	}
-
-	.labels{
-		font: Gotham;
-		size: 10pt;
-	}
-	#container{
-		width:100%;
-		height:100%;
-	}*/
-</style>
-</head>
-
-<body>
+	<style type="text/css">
+	    svg { 
+			display: block;
+			margin: auto;
+		}
+	</style>
 
 	<script type="text/javascript" src="libs/d3.v4.min.js"></script>
 	<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
 
-	<p>
-  		<label for="nRadius" style="display: inline-block; width: 240px; text-align: right"> 
-  			radius = <span id="nRadius-value">…</span>
-  		</label>
-  		<input type="range" min="1" max="1000" id="nRadius">
-	</p>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#fullpage').fullpage({
+				sectionsColor: ['#f2f2f2', '#4BBFC3', '#7BAABE', 'whitesmoke', '#ccddff', '#f2f2f2', '#4BBFC3']
+			});
+		});
+	</script>
 
-	<div id="vizContainer"></div>
+</head>
+
+<body>
+
+	
+	<div id="fullpage">
+		<div class="section" id="sectionIntro">
+			INTRO
+		</div>
+		<div class="section" id="section1">
+			<p>
+		  		<label for="nSLider1" style="display: inline-block; width: 240px; text-align: right"> 
+		  			Year: <span id="nYear-value1">…</span>
+		  		</label>
+		  		<input type="range" min="1" max="1000" id="nSLider1">
+			</p>
+
+			<div id="vizContainer1"></div>
+		</div>
+
+		<div class="section" id="section2">
+			<p>
+		  		<label for="nSLider2" style="display: inline-block; width: 240px; text-align: right"> 
+		  			Year: <span id="nYear-value2">…</span>
+		  		</label>
+		  		<input type="range" min="1" max="1000" id="nSLider2">
+			</p>
+
+			<div id="vizContainer2"></div>
+		</div>
+
+		<div class="section" id="section3">
+			
+		</div>
+
+		<div class="section" id="section4">
+			
+		</div>
+
+		<div class="section" id="sectionSummary">
+			SUMMARY
+		</div>
+	</div>
 
 	<script type="text/javascript">
-		var TSSdata = [];
+		var improvedWaterSourceData;
+		var fertilityRateData;
+		var infantMortalityData;
+		var maternalMortalityData;
+		var primaryCompletionData;
+
+		var allData = [];
+
+		var currentVisibleDataAbove1;
+		var currentVisibleDataBelow1;
+		var currentVisibleDataAbove2;
+		var currentVisibleDataBelow2;
+		var currentVisibleDataAbove3;
+		var currentVisibleDataBelow3;
+		var currentVisibleDataAbove4;
+		var currentVisibleDataBelow4;
+
+		var width = 800;
+		var height = 800;
 		var svgCanvas;
 
-		d3.csv("data/improved_water_source.csv", function(data) {
-			for (var i=0; i < data.length; i++) {
-				if(data[i]["Country Code"] == "TSS") {
-					for(var key in data[i]) {
-						if(parseInt(key) >= 1990 && parseInt(key) <= 2015) {
-							var object = {};
-							object["year"] = parseInt(key);
-							object["value"] = parseFloat(data[i][key]);
-							TSSdata.push(object);
+		function getCountriesData(data) {
+			var countriesData = d3.nest()
+			 	.key(function(d) {
+			 		return d["Country Code"];
+				})
+				.rollup(function(d) {
+					var dataEntries = d3.map(d[0]).entries();
+
+					var years = d3.map();
+					var meta = d3.map();
+
+					for (var i = 0; i < dataEntries.length; i++) {
+						if (!isNaN(parseInt(dataEntries[i].key))) {
+							if (parseInt(dataEntries[i].key) >= 1990 && parseInt(dataEntries[i].key) <= 2014) {
+								if (!isNaN(parseFloat(dataEntries[i].value))) {
+									years.set(parseInt(dataEntries[i].key), parseFloat(dataEntries[i].value));
+								}
+							}
+						} else {
+							meta.set(dataEntries[i].key, dataEntries[i].value);
 						}
 					}
-					break;
-				}
-			}
-			TSSdata.sort(function(x, y) {
-				return d3.ascending(x.year, y.year);
-			})
 
-			drawCanvas();
+					return {
+						"years": years,
+						"meta": meta
+					}
+				})
+				.map(data);
+
+			return countriesData;
+		}
+
+		d3.csv("data/improved_water_source.csv", function(data) {
+			improvedWaterSourceData = getCountriesData(data)["$TSS"];
+
+			d3.csv("data/fertility_rate.csv", function(data) {
+				fertilityRateData = getCountriesData(data)["$TSS"];
+
+				d3.csv("data/infant_mortality_rate.csv", function(data) {
+					infantMortalityData = getCountriesData(data)["$TSS"];
+					
+					d3.csv("data/maternal_mortality_rate.csv", function(data) {
+						maternalMortalityData = getCountriesData(data)["$TSS"];
+
+						d3.csv("data/primary_completion_rate.csv", function(data) {
+							primaryCompletionData = getCountriesData(data)["$TSS"];
+
+							console.log(primaryCompletionData);
+							
+							allData = [
+								[maternalMortalityData, improvedWaterSourceData],
+								[infantMortalityData, improvedWaterSourceData],
+								[fertilityRateData, improvedWaterSourceData],
+								[primaryCompletionData, improvedWaterSourceData]
+							];
+
+							drawCanvas(1);
+						});
+					});
+				});
+			});
 		});
 
-		// var sliderScale = d3.scaleLinear()
-		// 	.domain([TSSdata[0].year, TSSdata[TSSdata.length - 1].year])
-		// 	.range([0, TSSdata.length - 1]);
+		var arcAbove = d3.arc()
+				.innerRadius(0)
+			    .outerRadius(20)
+			    .startAngle(-90 * (Math.PI/180))
+			    .endAngle(90 * (Math.PI/180));
 
-		function drawCanvas() {
-			var width = 800;
-			var height = 600;
-			
-			svgCanvas = d3.select("#vizContainer").append("svg") 
+		var arcBelow = d3.arc()
+				.innerRadius(0)
+			    .outerRadius(20)
+			    .startAngle(90 * (Math.PI/180))
+			    .endAngle(270 * (Math.PI/180));
+
+		
+
+		function drawCanvas(index) { // 1-4
+			svgCanvas = d3.select("#vizContainer"+index).append("svg") 
 				.attrs({
 					width: width,
 					height: height
 				});
 
-			svgCanvas.append("circle")
-				.attrs({
-					cx: 300,
-					cy: 200,
-					fill: "none",
-					stroke: "blue"
-				});
-
-			d3.select("#nRadius").on("input", function() {
-	  			update(+this.value);
+			d3.select("#nSLider"+index).on("input", function() {
+	  			update(+this.value, eval("currentVisibleDataAbove" + index), eval("currentVisibleDataBelow" + index), index);
 			});
 
-			update(1);
+		    svgCanvas.append("path")
+		    	.attrs({
+		    		d: arcAbove,
+		    		transform: "translate(400,300)",
+		    		id: "arc1-" + index
+		    	});
+
+		    svgCanvas.append("path")
+		    	.attrs({
+		    		d: arcBelow,
+		    		transform: "translate(400,320)",
+		    		id: "arc2-" + index
+		    	});
+
+		    update(1, allData[index-1][0], allData[index-1][1], index);
 		}
 
-		function update(sliderValue) {
-			var years = [];
-			for (var i=0; i < TSSdata.length; i++) {
-				years.push(TSSdata[i]["year"]);
+		function update(sliderValue, visibleDataAbove, visibleDataBelow, sectionIndex) {
+			eval("currentVisibleDataBelow" + sectionIndex + " = visibleDataBelow;");
+			eval("currentVisibleDataAbove" + sectionIndex + "= visibleDataAbove;"); 
+
+			var years = visibleDataBelow.years.keys();
+			for (var i=0; i < years.length; i++) {
+				years[i] = parseInt(years[i]);
 			}
 
 			var sliderScale = d3.scaleQuantize()
@@ -101,23 +215,36 @@
 				.range(years);
 
 			var selectedYear = sliderScale(sliderValue);
-			d3.select("#nRadius-value").text(selectedYear);
+			d3.select("#nYear-value" + sectionIndex).text(selectedYear);
+			d3.select("#nSLider" + sectionIndex).property("value", sliderValue);
 
-			
-			var selectedIndex;
-			for (var j = 0; j < years.length; j++) {
-				if (years[j] == selectedYear) {
-					selectedIndex = j;
-				}
-			}
+			var minRadius = 20;
+			var maxRadius = 250;
 
-			d3.select("#nRadius").property("value", sliderValue);
+			var minAbove = d3.min(visibleDataAbove.years.values());
+			var maxAbove = d3.max(visibleDataAbove.years.values());
+			var radiusScaleAbove = d3.scaleLinear().domain([minAbove, maxAbove]).range([minRadius, maxRadius]);
 
-			svgCanvas.selectAll("circle") 
-				.attr("r", TSSdata[selectedIndex].value);
+			var minBelow = d3.min(visibleDataBelow.years.values());
+			var maxBelow = d3.max(visibleDataBelow.years.values());
+			var radiusScaleBelow = d3.scaleLinear().domain([minBelow, maxBelow]).range([minRadius, maxRadius]);
+
+			arcAbove.outerRadius(radiusScaleAbove(visibleDataAbove.years["$"+selectedYear]));
+			d3.select("#arc1-" + sectionIndex).transition()
+				.duration(500)
+				.attr("d", arcAbove);
+
+			arcBelow.outerRadius(radiusScaleBelow(visibleDataBelow.years["$"+selectedYear]));
+			d3.select("#arc2-" + sectionIndex).transition()
+				.duration(500)
+				.attr("d", arcBelow);
+
+			console.log("update canvas " + sectionIndex);
 		}
 		
 
 	</script>
+	
+	
 </body>
 </html>

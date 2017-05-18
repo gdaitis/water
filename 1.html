@@ -1,33 +1,17 @@
 <!DOCTYPE html> 
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>CHANGE TITLE HERE</title>
 
-
-
-<style type="text/css">
-    svg { 
-		display: block;
-		margin: auto;
-	}
-</style>
 </head>
 
 <body>
-
-	<script type="text/javascript" src="libs/d3.v4.min.js"></script>
-	<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 	<p>
-  		<label for="nSlider" style="display: inline-block; width: 240px; text-align: right"> 
-  			Year: <span id="nYear-value">…</span>
+  		<label for="nSLider1" style="display: inline-block; width: 240px; text-align: right"> 
+  			Year: <span id="nYear-value1">…</span>
   		</label>
-  		<input type="range" min="1" max="1000" id="nSlider">
+  		<input type="range" min="1" max="1000" id="nSLider1">
 	</p>
 
-	<div id="vizContainer"></div>
+	<div id="vizContainer1"></div>
 
 	<script type="text/javascript">
 		var improvedWaterSourceData;
@@ -38,8 +22,8 @@
 
 		var allData = [];
 
-		var currentVisibleDataAbove;
-		var currentVisibleDataBelow;
+		var currentVisibleDataAbove1;
+		var currentVisibleDataBelow1;
 
 		var width = 800;
 		var height = 800;
@@ -98,12 +82,11 @@
 							allData = [
 								[maternalMortalityData, improvedWaterSourceData],
 								[infantMortalityData, improvedWaterSourceData],
-								[fertilityRateData, infantMortalityData],
 								[fertilityRateData, improvedWaterSourceData],
 								[primaryCompletionData, improvedWaterSourceData]
 							];
 
-							drawCanvas();
+							drawCanvas1();
 						});
 					});
 				});
@@ -122,62 +105,37 @@
 			    .startAngle(90 * (Math.PI/180))
 			    .endAngle(270 * (Math.PI/180));
 
-		var currentDataIndex = 0;
-
-		function drawCanvas() {
-			svgCanvas = d3.select("#vizContainer").append("svg") 
+		function drawCanvas1() {
+			svgCanvas = d3.select("#vizContainer1").append("svg") 
 				.attrs({
 					width: width,
 					height: height
 				});
 
-			d3.select("#nSlider").on("input", function() {
-	  			update(+this.value, currentVisibleDataAbove, currentVisibleDataBelow);
+			d3.select("#nSLider1").on("input", function() {
+	  			update1(+this.value, currentVisibleDataAbove1, currentVisibleDataBelow1);
 			});
 
 		    svgCanvas.append("path")
 		    	.attrs({
 		    		d: arcAbove,
 		    		transform: "translate(400,300)",
-		    		id: "arc1"
+		    		id: "arc1-1"
 		    	});
 
 		    svgCanvas.append("path")
 		    	.attrs({
 		    		d: arcBelow,
 		    		transform: "translate(400,320)",
-		    		id: "arc2"
+		    		id: "arc2-1"
 		    	});
 
-            d3.select("body").append("button")
-                .text("back")
-                .attrs({
-                	id: "back-button"
-                })
-                .on("click", function() {
-                	if (currentDataIndex != 0) {
-                		currentDataIndex--;
-                		update(1, allData[currentDataIndex][0], allData[currentDataIndex][1]);
-                	}
-                });
-            d3.select("body").append("button")
-                .text("next")
-                .attrs({
-                	id: "next-button"
-                })
-                .on("click", function() {
-                    if (currentDataIndex != 4) {
-                		currentDataIndex++;
-                		update(1, allData[currentDataIndex][0], allData[currentDataIndex][1]);
-                	}
-                });
-
-		    update(1, allData[0][0], allData[0][1]);
+		    update1(1, allData[0][0], allData[0][1]);
 		}
 
-		function update(sliderValue, visibleDataAbove, visibleDataBelow) {
-			currentVisibleDataBelow = visibleDataBelow;
-			currentVisibleDataAbove = visibleDataAbove;
+		function update1(sliderValue, visibleDataAbove, visibleDataBelow) {
+			currentVisibleDataBelow1 = visibleDataBelow;
+			currentVisibleDataAbove1 = visibleDataAbove;
 
 			var years = visibleDataBelow.years.keys();
 			for (var i=0; i < years.length; i++) {
@@ -189,8 +147,8 @@
 				.range(years);
 
 			var selectedYear = sliderScale(sliderValue);
-			d3.select("#nYear-value").text(selectedYear);
-			d3.select("#nSlider").property("value", sliderValue);
+			d3.select("#nYear-value1").text(selectedYear);
+			d3.select("#nSLider1").property("value", sliderValue);
 
 			var minRadius = 20;
 			var maxRadius = 250;
@@ -204,14 +162,16 @@
 			var radiusScaleBelow = d3.scaleLinear().domain([minBelow, maxBelow]).range([minRadius, maxRadius]);
 
 			arcAbove.outerRadius(radiusScaleAbove(visibleDataAbove.years["$"+selectedYear]));
-			d3.select("#arc1").transition()
+			d3.select("#arc1-1").transition()
 				.duration(500)
 				.attr("d", arcAbove);
 
 			arcBelow.outerRadius(radiusScaleBelow(visibleDataBelow.years["$"+selectedYear]));
-			d3.select("#arc2").transition()
+			d3.select("#arc2-1").transition()
 				.duration(500)
 				.attr("d", arcBelow);
+
+			console.log("update canvas 1");
 		}
 		
 
