@@ -61,11 +61,25 @@
 		</div>
 
 		<div class="section" id="section3">
-			
+			<p>
+		  		<label for="nSLider3" style="display: inline-block; width: 240px; text-align: right"> 
+		  			Year: <span id="nYear-value3">…</span>
+		  		</label>
+		  		<input type="range" min="1" max="1000" id="nSLider3">
+			</p>
+
+			<div id="vizContainer3"></div>
 		</div>
 
 		<div class="section" id="section4">
-			
+			<p>
+		  		<label for="nSLider4" style="display: inline-block; width: 240px; text-align: right"> 
+		  			Year: <span id="nYear-value4">…</span>
+		  		</label>
+		  		<input type="range" min="1" max="1000" id="nSLider4">
+			</p>
+
+			<div id="vizContainer4"></div>
 		</div>
 
 		<div class="section" id="sectionSummary">
@@ -153,6 +167,9 @@
 							];
 
 							drawCanvas(1);
+							drawCanvas(2);
+							drawCanvas(3);
+							drawCanvas(4);
 						});
 					});
 				});
