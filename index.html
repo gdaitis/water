@@ -1,0 +1,123 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CHANGE TITLE HERE</title>
+
+
+
+<style type="text/css">
+/*	svg{ 
+		background-color: "black";
+	}
+
+	.labels{
+		font: Gotham;
+		size: 10pt;
+	}
+	#container{
+		width:100%;
+		height:100%;
+	}*/
+</style>
+</head>
+
+<body>
+
+	<script type="text/javascript" src="libs/d3.v4.min.js"></script>
+	<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+
+	<p>
+  		<label for="nRadius" style="display: inline-block; width: 240px; text-align: right"> 
+  			radius = <span id="nRadius-value">…</span>
+  		</label>
+  		<input type="range" min="1" max="1000" id="nRadius">
+	</p>
+
+	<div id="vizContainer"></div>
+
+	<script type="text/javascript">
+		var TSSdata = [];
+		var svgCanvas;
+
+		d3.csv("data/improved_water_source.csv", function(data) {
+			for (var i=0; i < data.length; i++) {
+				if(data[i]["Country Code"] == "TSS") {
+					for(var key in data[i]) {
+						if(parseInt(key) >= 1990 && parseInt(key) <= 2015) {
+							var object = {};
+							object["year"] = parseInt(key);
+							object["value"] = parseFloat(data[i][key]);
+							TSSdata.push(object);
+						}
+					}
+					break;
+				}
+			}
+			TSSdata.sort(function(x, y) {
+				return d3.ascending(x.year, y.year);
+			})
+
+			drawCanvas();
+		});
+
+		// var sliderScale = d3.scaleLinear()
+		// 	.domain([TSSdata[0].year, TSSdata[TSSdata.length - 1].year])
+		// 	.range([0, TSSdata.length - 1]);
+
+		function drawCanvas() {
+			var width = 800;
+			var height = 600;
+			
+			svgCanvas = d3.select("#vizContainer").append("svg") 
+				.attrs({
+					width: width,
+					height: height
+				});
+
+			svgCanvas.append("circle")
+				.attrs({
+					cx: 300,
+					cy: 200,
+					fill: "none",
+					stroke: "blue"
+				});
+
+			d3.select("#nRadius").on("input", function() {
+	  			update(+this.value);
+			});
+
+			update(1);
+		}
+
+		function update(sliderValue) {
+			var years = [];
+			for (var i=0; i < TSSdata.length; i++) {
+				years.push(TSSdata[i]["year"]);
+			}
+
+			var sliderScale = d3.scaleQuantize()
+				.domain([1, 1000])
+				.range(years);
+
+			var selectedYear = sliderScale(sliderValue);
+			d3.select("#nRadius-value").text(selectedYear);
+
+			
+			var selectedIndex;
+			for (var j = 0; j < years.length; j++) {
+				if (years[j] == selectedYear) {
+					selectedIndex = j;
+				}
+			}
+
+			d3.select("#nRadius").property("value", sliderValue);
+
+			svgCanvas.selectAll("circle") 
+				.attr("r", TSSdata[selectedIndex].value);
+		}
+		
+
+	</script>
+</body>
+</html>
