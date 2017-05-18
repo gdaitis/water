@@ -26,6 +26,7 @@
 
 	<script type="text/javascript" src="libs/d3.v4.min.js"></script>
 	<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 	<p>
   		<label for="nSlider" style="display: inline-block; width: 240px; text-align: right"> 
@@ -37,10 +38,17 @@
 	<div id="vizContainer"></div>
 
 	<script type="text/javascript">
-		var visibleData;
+		var visibleDataBelow;
+		var visibleDataAbove;
 		var svgCanvas;
 
-		d3.csv("data/improved_water_source.csv", function(data) {
+		// $(document).on("keypress", function (e) {
+  //   		if (e.which == 39) {
+  //   			console.log("works");
+  //   		}
+		// });
+
+		function getCountriesData(data) {
 			var countriesData = d3.nest()
 			 	.key(function(d) {
 			 		return d["Country Code"];
@@ -68,9 +76,17 @@
 				})
 				.map(data);
 
-			visibleData = countriesData["$TSS"];
+			return countriesData;
+		}
 
-			drawCanvas();
+		d3.csv("data/improved_water_source.csv", function(data) {
+			visibleDataBelow = getCountriesData(data)["$TSS"];
+
+			d3.csv("data/fertility_rate.csv", function(data) {
+				visibleDataAbove = getCountriesData(data)["$TSS"];
+
+				drawCanvas();
+			});
 		});
 
 		var arcAbove = d3.arc()
@@ -117,7 +133,7 @@
 		}
 
 		function update(sliderValue) {
-			var years = visibleData.years.keys();
+			var years = visibleDataBelow.years.keys();
 			for (var i=0; i < years.length; i++) {
 				years[i] = parseInt(years[i]);
 			}
@@ -130,16 +146,23 @@
 			d3.select("#nYear-value").text(selectedYear);
 			d3.select("#nSlider").property("value", sliderValue);
 
-			var min = d3.min(visibleData.years.values());
-			var max = d3.max(visibleData.years.values());
-			var radiusScale = d3.scaleLinear().domain([min, max]).range([20, 150]);
+			var minRadius = 20;
+			var maxRadius = 150;
 
-			arcAbove.outerRadius(radiusScale(visibleData.years["$"+selectedYear]));
+			var minAbove = d3.min(visibleDataAbove.years.values());
+			var maxAbove = d3.max(visibleDataAbove.years.values());
+			var radiusScaleAbove = d3.scaleLinear().domain([minAbove, maxAbove]).range([minRadius, maxRadius]);
+
+			var minBelow = d3.min(visibleDataBelow.years.values());
+			var maxBelow = d3.max(visibleDataBelow.years.values());
+			var radiusScaleBelow = d3.scaleLinear().domain([minBelow, maxBelow]).range([minRadius, maxRadius]);
+
+			arcAbove.outerRadius(radiusScaleAbove(visibleDataAbove.years["$"+selectedYear]));
 			d3.select("#arc1").transition()
 				.duration(500)
 				.attr("d", arcAbove);
 
-			arcBelow.outerRadius(radiusScale(visibleData.years["$"+selectedYear]));
+			arcBelow.outerRadius(radiusScaleBelow(visibleDataBelow.years["$"+selectedYear]));
 			d3.select("#arc2").transition()
 				.duration(500)
 				.attr("d", arcBelow);
