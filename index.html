@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>CHANGE TITLE HERE</title>
+	<title>Water</title>
 
 	<link rel="stylesheet" type="text/css" href="libs/jquery.fullPage.css" />
 	<link href=“https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700|Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i” rel=“stylesheet”>
@@ -144,10 +144,10 @@
 	<div id="fullpage">
 		<div class="section" id="sectionIntro">
 			<div class="intro">
-				<h1 style="color: #92DCE5">
-					Water resources related<br />
+				<h1 style="color: #50B7EA">
+					Water resources are related<br />
 					to health and education<br />
-					for women and girls in Africa.
+					of women and girls in Africa
 				</h1>
 
 				<p>
@@ -192,7 +192,7 @@
 		<div class="section" id="section2">
 			<div class="texts">
 				<div class="texts-sub">
-					<h1 style="color: #2CC4B2">Babies have a higher<br />chance of growing up</h1>
+					<h1 style="color: #69D1AF">Babies have a higher<br />chance of growing up</h1>
 					<p>
 						With the improved water source increasing<br />
 						in the timespan of ten years, the infant mortality<br />
@@ -272,20 +272,17 @@
 
 		<div class="section" id="sectionSummary">
 			<div class="intro">
-				<h1 style="color: #92DCE5">
-					Water resources related<br />
-					to health and education<br />
-					for women and girls in Africa.
+				<h1 style="color: #50B7EA">
+					Things are getting better
 				</h1>
 
 				<p>
-					The poor access to water supply is a prevalent issue<br />
-					in over 850 million people worldwide. Since 1990,<br />
-					2.6 billion people have gained access to improved<br />
-					drinking water and today, 91% of the world’s population<br />
-					drink clean water. Data showes that improved water source<br />
-					is linked to health and education for women and girls<br />
-					in the Sub-Saharan Africa.
+					While it is not directly obvious, the increased access<br />
+					to improved drinking water supply has significantly<br />
+					contributed to the progress of humanitarian situation<br />
+					in Sub-Saharan Africa. Issues like infant and maternal<br />
+					mortality as well as education of girls are being solved.<br />
+					Let's have more patience.
 				</p>
 			</div>
 		</div>
@@ -313,7 +310,7 @@
 		var height = 430;
 		var svgCanvas;
 
-		var colors = ["#8EC949", "#2CC4B2", "#F4AA27", "#EF5B77"];
+		var colors = ["#8EC949", "#69D1AF", "#F4AA27", "#EF5B77"];
 
 		var legends = [
 			"Maternal mortality ratio\n(per 100,000 live births)", 
@@ -425,7 +422,7 @@
 		    		d: arcBelow,
 		    		transform: "translate(250, 220)",
 		    		id: "arc2-" + index,
-		    		fill: "#92DCE5"
+		    		fill: "#50B7EA"
 		    	});
 
 		    svgCanvas.append("line")
@@ -440,7 +437,7 @@
 
 		    svgCanvas.append("line")
 		    	.attrs({
-		    		stroke: "#92DCE5",
+		    		stroke: "#50B7EA",
 		    		opacity: 1,
 		    		x1: 0,
 		    		y1: 221,
@@ -480,7 +477,7 @@
 		    		"font-weight": 900,
 		    		"font-family": "'Roboto', sans-serif",
 		    		"text-anchor": "start",
-		    		fill: "#92DCE5",
+		    		fill: "#50B7EA",
 		    		id: "text-below-" + index
 		    	})
 
@@ -549,7 +546,7 @@
 				.attr("d", arcBelow);
 			d3.select("#text-below-" + sectionIndex)
 				.text(function(d) {
-					return parseInt(visibleDataBelow.years["$"+selectedYear]);
+					return parseInt(visibleDataBelow.years["$"+selectedYear]) + "%";
 				});
 		}
 		
